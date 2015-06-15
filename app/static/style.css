@@ -1,0 +1,17 @@
+/* fonts */
+body	{ font-family: 'Georgia', serif; }
+h1	{ font-family: 'Garamond', 'Georgia', sans-serif; }
+
+/* colors */
+div.body	{ color: #3E4349; }
+a		{ color: #004B6B; }
+a:hover		{ color: #6D4100; }
+
+/* Align */
+body {
+	margin-left: auto;
+	margin-right: auto;
+	width: 700px;
+}
+
+h1	{ text-align: center; }
