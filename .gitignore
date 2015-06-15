@@ -1,1 +1,6 @@
+# Virtualenv
+.Python
 *.pyc
+bin/
+lib/
+include/
