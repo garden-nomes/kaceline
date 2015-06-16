@@ -9,15 +9,16 @@ from app import mysql
 def index():
     """ home page view, basically all of the stuff will go here.
     """
-    # create cursor from database connection, which returns
-    # entres as dictionary objects.
     cur = mysql.connection.cursor(cursorclass=DictCursor)
-    # query for all the tickets from last week
-    cur.execute('select * from HD_TICKET where MODIFIED < NOW() - INTERVAL 1 WEEK')
-    results = [e for e in cur.fetchall() if ]
-    # render the template and pass in most recent ticket changes
+    cur.execute(
+        'select * from HD_TICKET'
+        'where MODIFIED < NOW() - INTERVAL 1 WEEK'
+        'and HD_QUEUE_ID = 18')
+    results = [ticket for ticket in cur.fetchall()]
+    results.sort(key=lambda t: t['MODIFIED'])
     return render_template('timeline.html',
-                           title='kaceline')
+                           title='kaceline',
+                           tickets=results)
 
 
 @app.route('/changes')
