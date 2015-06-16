@@ -22,9 +22,16 @@ def index():
             'select * from HD_TICKET_CHANGE'
             'where HD_TICKET_ID = %s' % (ticket['ID']))
         changes.append([change for change in cur.fetchall()])
+        
+    # put all the data into one place for passing into template
+    data = [{'ticket_id': ticket['ID'],
+             'submitter_id': ticket['SUBMITTER_ID'],
+             'changes': [change for change in changes
+                         if change['HD_TICKET_ID'] == ticket['ID']]}
+            for ticket in tickets]
     return render_template('timeline.html',
                            title='kaceline',
-                           tickets=tickets)
+                           data=data)
 
 
 @app.route('/changes')
