@@ -29,7 +29,7 @@ def index():
               'submitter_id': change['USER_ID'],
               'description': change['DESCRIPTION'],
               'timestamp': change['TIMESTAMP'],
-              'comments': change['COMMENT'],
+              'comment': change['COMMENT'],
               'ticket_title': [t['TITLE'] for t in tickets
                                if t['ID'] == change['HD_TICKET_ID']][0]}
              for change in c] for c in changes]

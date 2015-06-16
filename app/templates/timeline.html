@@ -4,15 +4,22 @@
 <div class="content">
 
     <h1 class="title">KACELINE</h1>
+    
+    <form action="{{ url_for("index") }}" method=post class="date-range">
+    	<input type="submit" name="time" value="day" />
+    	<input type="submit" name="time" value="week" />
+    	<input type="submit" name="time" value="month" />
+    </form>
+
     <hr />
 
-    {% if entries %}
+    {% if data %}
         <ul class="timeline">
-        {% for ticket in entries %}
-        {% for entry in ticket %}
-	    <li><span class="date">{{ entry.TIMESTAMP.strftime("%b %m %Y, %I:%M%p") }}</span>{% if entry.DESCRIPTION %} - <span class="description">{{ entry.DESCRIPTION }}</span>{% endif %}
+        {% for changes in data %}
+	{% for change in changes %}
+	    <li><span class="date">{{ change.timestamp.strftime("%b %m %Y, %I:%M%p") }}</span>{% if change.description %} - <span class="description">{{ change.description }}</span>{% endif %}
 
-	        <pre class="comment">{{ entry.COMMENT }}</pre>
+	        <pre class="comment">{{ change.comment }}</pre>
             </li>
 	{% endfor %}
 	{% endfor %}
