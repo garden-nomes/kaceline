@@ -12,7 +12,7 @@ def index():
     cur = mysql.connection.cursor(cursorclass=DictCursor)
     cur.execute(
         'select * from HD_TICKET'
-        'where MODIFIED < NOW() - INTERVAL 1 WEEK'
+        'where MODIFIED > NOW() - INTERVAL 1 WEEK'
         'and HD_QUEUE_ID = 18')
     results = [ticket for ticket in cur.fetchall()]
     results.sort(key=lambda t: t['MODIFIED'])
