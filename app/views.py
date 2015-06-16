@@ -2,7 +2,7 @@ from MySQLdb.cursors import DictCursor
 from flask import render_template
 from app import app
 from app import mysql
-
+from pprint import pprint
 
 @app.route('/')
 @app.route('/index')
@@ -28,10 +28,11 @@ def index():
     data = [[{'ticket_id': change['HD_TICKET_ID'],
               'submitter_id': change['USER_ID'],
               'description': change['DESCRIPTION'],
+              'timestamp': change['TIMESTAMP'],
               'ticket_title': [t['TITLE'] for t in tickets
                                if t['ID'] == change['HD_TICKET_ID']][0]}
              for change in c] for c in changes]
-    print data
+    pprint(data[0])
     return render_template('timeline.html',
                            title='kaceline',
                            data=data)
