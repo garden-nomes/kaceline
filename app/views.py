@@ -29,7 +29,7 @@ def index():
              'submitter_id': change['USER_ID'],
              'description': change['DESCRIPTION'],
              'ticket_title': [t['TITLE'] for t in tickets
-                              if t['ID'] == change['HD_TICKET_ID']]}
+                              if t['ID'] == change['HD_TICKET_ID']][0]}
             for change in changes]
 
     return render_template('timeline.html',
