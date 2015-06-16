@@ -23,9 +23,10 @@
 	{% for change in changes %}
 	    <li class="">
 		<p>
-		    <span class="text-muted">{{ change.timestamp.strftime("%b %m %Y, %I:%M%p") }}</span>
+		    <span class="text-muted">{{ change.timestamp.strftime("%b %m %Y, %I:%M%p") }} - </span>
+		    <span class="">{{ change.submitter_name }}</span>
 		</p>
-		<h4>{{ change.ticket_title }}
+		<h4><a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}">{{ change.ticket_title }}</a>
 		    {% if change.description %}<small> - {{ change.description }}</small>{% endif %}</h4>
 
 	        <p class="comment">{{ change.comment }}</p>
