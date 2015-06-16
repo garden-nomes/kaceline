@@ -22,13 +22,16 @@ def index():
             'select * from HD_TICKET_CHANGE'
             'where HD_TICKET_ID = %s' % (ticket['ID']))
         changes.append([change for change in cur.fetchall()])
-        
+
     # put all the data into one place for passing into template
-    data = [{'ticket_id': ticket['ID'],
-             'submitter_id': ticket['SUBMITTER_ID'],
-             'changes': [change for change in changes
-                         if change['HD_TICKET_ID'] == ticket['ID']]}
-            for ticket in tickets]
+    # list of ticket changes as dicts
+    data = [{'ticket_id': change['HD_TICKET_ID'],
+             'submitter_id': change['USER_ID'],
+             'description': change['DESCRIPTION'],
+             'ticket_title': [t['TITLE'] for t in tickets
+                              if t['ID'] == change['HD_TICKET_ID']]}
+            for change in changes]
+
     return render_template('timeline.html',
                            title='kaceline',
                            data=data)
