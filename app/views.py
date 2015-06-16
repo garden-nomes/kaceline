@@ -23,10 +23,14 @@ def query_database(cur, time='WEEK'):  # helper function
             ' where HD_TICKET_ID = %s' % (ticket['ID']))
         changes.append([change for change in cur.fetchall()])
 
+    cur.execute('select * from USER')
+    users = [u for u in cur.fetchall()]
     # put all the data into one place for passing into template
     # as a list of lists of ticket change dictionaries
     data = [[{'ticket_id': change['HD_TICKET_ID'],
               'submitter_id': change['USER_ID'],
+              'submitter_name': [u for u in users
+                                 if u['ID'] == change['USER_ID']][0],
               'description': change['DESCRIPTION'],
               'timestamp': change['TIMESTAMP'],
               'comment': change['COMMENT'],
