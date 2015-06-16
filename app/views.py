@@ -14,11 +14,17 @@ def index():
         'select * from HD_TICKET'
         'where MODIFIED > NOW() - INTERVAL 1 WEEK'
         'and HD_QUEUE_ID = 18')
-    results = [ticket for ticket in cur.fetchall()]
-    results.sort(key=lambda t: t['MODIFIED'])
+    tickets = [ticket for ticket in cur.fetchall()]
+    tickets.sort(key=lambda t: t['MODIFIED'])
+    changes = []
+    for ticket in tickets:
+        cur.execute(
+            'select * from HD_TICKET_CHANGE'
+            'where HD_TICKET_ID = %s' % (ticket['ID']))
+        changes.append([change for change in cur.fetchall()])
     return render_template('timeline.html',
                            title='kaceline',
-                           tickets=results)
+                           tickets=tickets)
 
 
 @app.route('/changes')
