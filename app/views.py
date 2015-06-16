@@ -1,30 +1,30 @@
 from MySQLdb.cursors import DictCursor
-from flask import render_template
+from flask import render_template, request
 from app import app
 from app import mysql
-from pprint import pprint
 
-@app.route('/')
-@app.route('/index')
-def index():
-    """ home page view, basically all of the stuff will go here.
+
+def query_database(cur, time='WEEK'):  # helper function
+    """ Input: cur -> MySQLdb cursor into database
+               time -> a string containing one of ['DAY', 'WEEK', 'MONTH']
+        Output: data -> All tickets and their associated changes from the
+                        last day, week, or month.
     """
-    cur = mysql.connection.cursor(cursorclass=DictCursor)
-    cur.execute(
+    cur.execute(  # build & execute query to grab relevant tickets
         'select * from HD_TICKET'
-        ' where MODIFIED > NOW() - INTERVAL 1 WEEK'
-        ' and HD_QUEUE_ID = 18')
+        ' where MODIFIED > NOW() - INTERVAL 1 %s'
+        ' and HD_QUEUE_ID = 18' % time)  # interpolate desired time frame
     tickets = [ticket for ticket in cur.fetchall()]
     tickets.sort(key=lambda t: t['MODIFIED'])
     changes = []
     for ticket in tickets:
-        cur.execute(
+        cur.execute(  # for each ticket, grab associated changes
             'select * from HD_TICKET_CHANGE'
             ' where HD_TICKET_ID = %s' % (ticket['ID']))
         changes.append([change for change in cur.fetchall()])
 
     # put all the data into one place for passing into template
-    # list of ticket changes as dicts
+    # as a list of lists of ticket change dictionaries
     data = [[{'ticket_id': change['HD_TICKET_ID'],
               'submitter_id': change['USER_ID'],
               'description': change['DESCRIPTION'],
@@ -33,10 +33,30 @@ def index():
               'ticket_title': [t['TITLE'] for t in tickets
                                if t['ID'] == change['HD_TICKET_ID']][0]}
              for change in c] for c in changes]
-    pprint(data[0])
-    return render_template('timeline.html',
-                           title='kaceline',
-                           data=data)
+
+    return data
+
+
+@app.route('/')
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    """ Home page view.
+    """
+    # create cursor into mysql database
+    cur = mysql.connection.cursor(cursorclass=DictCursor)
+
+    if request.method == 'POST':
+        time = request.form['time']  # grab user input
+        data = query_database(cur, time)  # query db & render data
+        return render_template('timeline.html',
+                               title='kaceline',
+                               data=data)
+
+    else:
+        data = query_database(cur)  # defaults to WEEK
+        return render_template('timeline.html',
+                               title='kaceline',
+                               data=data)
 
 
 @app.route('/changes')
