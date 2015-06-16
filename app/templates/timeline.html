@@ -1,19 +1,24 @@
-<!doctype html>
+{% extends "layout.html" %}
+{% block body %}
 
-<head>
-	<title>kaceline</title>
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-</head>
+<div class="content">
 
-<body>
-	<h1>KACELINE</h1>
-	<hr />
+    <h1 class="title">KACELINE</h1>
+    <hr />
 
-	<ul>Blahblah commented in blahblahblah:
-		<p>Blah blah blahlbhalbhasdlifhoiadbhiudahbfpabvxcnvboadifbouihcvohaposihdgraebagdboadhoibhfadoib.</p>
+    {% if entries %}
+        <ul class="timeline">
+        {% for ticket in entries %}
+        {% for entry in ticket %}
+	    <li><span class="date">{{ entry.TIMESTAMP.strftime("%b %m %Y, %I:%M%p") }}</span>{% if entry.DESCRIPTION %} - <span class="description">{{ entry.DESCRIPTION }}</span>{% endif %}
+
+	        <pre class="comment">{{ entry.COMMENT }}</pre>
+            </li>
+	{% endfor %}
+	{% endfor %}
 	</ul>
+    {% endif %}
 
-	<ul>Blahblah commented in blahblahblah:
-		<p>Blah blah blahlbhalbhasdlifhoiadbhiudahbfpabvxcnvboadifbouihcvohaposihdgraebagdboadhoibhfadoib.</p>
-	</ul>
-</body>
+</div>
+
+{% endblock %}
