@@ -52,7 +52,9 @@ def index():
     if request.method == 'POST':
         time = request.form['time']  # grab user input
         if time not in ['DAY', 'WEEK', 'YEAR']:
-            break  # prevent sql injection
+            return render_template('timeline.html',
+                               title='kaceline',
+                               data=data)
         data = query_database(cur, time)  # query db & render data
         return render_template('timeline.html',
                                title='kaceline',
