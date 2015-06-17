@@ -28,7 +28,7 @@ def query_database(cur, time='WEEK'):  # helper function
     # put all the data into one place for passing into template
     # as a list of lists of ticket change dictionaries
     data = [[{'ticket_id': change['HD_TICKET_ID'],
-              'submitter_id': change['USER_ID'],
+              'submitter_id':  change['USER_ID'],
               'submitter_name': [u for u in users
                                  if u['ID'] == change['USER_ID']][0],
               'description': change['DESCRIPTION'],
@@ -51,14 +51,15 @@ def index():
 
     if request.method == 'POST':
         time = request.form['time']  # grab user input
+        if time not in ['DAY', 'WEEK', 'YEAR']:
+            break  # prevent sql injection
         data = query_database(cur, time)  # query db & render data
         return render_template('timeline.html',
                                title='kaceline',
                                data=data)
-
-    else:
-        data = query_database(cur)  # defaults to WEEK
-        return render_template('timeline.html',
+    # otherwise
+    data = query_database(cur)  # defaults to WEEK
+    return render_template('timeline.html',
                                title='kaceline',
                                data=data)
 
