@@ -1,8 +1,8 @@
 from MySQLdb.cursors import DictCursor
+from collections import OrderedDict
 from flask import render_template, request
 from app import app
 from app import mysql
-
 
 def query_database(cur, time='WEEK'):  # helper function
     """ Input: cur -> MySQLdb cursor into database
@@ -43,8 +43,8 @@ def query_database(cur, time='WEEK'):  # helper function
     data = [change for sublist in data for change in sublist]
 
     # group by date
-    new_data = {}
-    for change in data:
+    new_data = OrderedDict()
+    for change in sorted(data, key=lambda t: t['timestamp'], reverse=True):
         date = change['timestamp'].date()
         if date in new_data.keys():
             new_data[date].append(change)
@@ -68,10 +68,12 @@ def index(time=None):
     if time not in ['day', 'week', 'month']:
         time = 'week'
 
+
     data = query_database(cur, time)  # query db & render data
     return render_template('timeline.html',
                                title='kaceline',
-                               data=data)
+                               data=data,
+                               time=time)
 
 
 @app.route('/changes')
