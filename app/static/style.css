@@ -11,6 +11,7 @@
 }
 
 h1	{ text-align: center; }
+h2.date { text-align: center; }
 
 pre {
 	white-space: pre-wrap;

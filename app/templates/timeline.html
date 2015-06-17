@@ -5,7 +5,7 @@
 
     <h1 class="title">kaceline</h1>
     
-    <form action="{{ url_for("index") }}" method=post class="date-range">
+    <form action="{{ url_for("index") }}" method=get class="date-range">
 	<div class="btn-group">
     	    <input class="btn btn-default" type="submit" name="time" value="day" />
     	    <input  class="btn btn-default" type="submit" name="time" value="week" />
@@ -18,12 +18,15 @@
     <br />
 
     {% if data %}
+        {% for date, changes in data.iteritems() %}
+        <h2 class="date">{{ date.strftime("%A, %B %d") }}</h2>
+        <br />
+        <br />
         <ul class="timeline list-unstyled">
-        {% for changes in data %}
-	{% for change in changes %}
+        {% for change in changes %}
 	    <li class="">
 		<p>
-		    <span class="text-muted">{{ change.timestamp.strftime("%b %m %Y, %I:%M%p") }} - </span>
+		    <span class="text-muted">{{ change.timestamp.strftime("%H:%M %p") }} - </span>
 		    <span class="">{{ change.submitter_name }}</span>
 		</p>
 		<h4><a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}">{{ change.ticket_title }}</a>
@@ -33,8 +36,8 @@
             </li>
 	    <hr />
 	{% endfor %}
-	{% endfor %}
 	</ul>
+	{% endfor %}
     {% endif %}
 
 </div>
