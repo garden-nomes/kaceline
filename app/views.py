@@ -24,15 +24,13 @@ def query_database(cur, time='WEEK'):  # helper function
             ' and HD_TICKET_ID = %s' % (time, ticket['ID']))
         changes.append([change for change in cur.fetchall()])
 
-    for time in [t['TIMESTAMP'] for t in changes[0]]:
-        print(time)
     cur.execute('select * from USER')
     users = [u for u in cur.fetchall()]
     # put all the data into one place for passing into template
     # as a list of lists of ticket change dictionaries
     data = [[{'ticket_id': change['HD_TICKET_ID'],
               'submitter_id':  change['USER_ID'],
-              'submitter_name': [u for u in users
+              'submitter_name': [u['USER_NAME'] for u in users
                                  if u['ID'] == change['USER_ID']][0],
               'description': change['DESCRIPTION'],
               'timestamp': change['TIMESTAMP'],
@@ -41,7 +39,21 @@ def query_database(cur, time='WEEK'):  # helper function
                                if t['ID'] == change['HD_TICKET_ID']][0]}
              for change in c] for c in changes]
 
-    return data
+    # join lists
+    data = [change for sublist in data for change in sublist]
+
+    # group by date
+    new_data = {}
+    for change in data:
+        date = change['timestamp'].date()
+        if date in new_data.keys():
+            new_data[date].append(change)
+        else:
+            new_data[date] = [ change ]
+    
+    print(new_data)
+
+    return new_data
 
 
 @app.route('/')
