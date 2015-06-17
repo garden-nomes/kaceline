@@ -20,9 +20,12 @@ def query_database(cur, time='WEEK'):  # helper function
     for ticket in tickets:
         cur.execute(  # for each ticket, grab associated changes
             'select * from HD_TICKET_CHANGE'
-            ' where HD_TICKET_ID = %s' % (ticket['ID']))
+            ' where TIMESTAMP > NOW() - INTERVAL 1 %s'
+            ' and HD_TICKET_ID = %s' % (time, ticket['ID']))
         changes.append([change for change in cur.fetchall()])
 
+    for time in [t['TIMESTAMP'] for t in changes[0]]:
+        print(time)
     cur.execute('select * from USER')
     users = [u for u in cur.fetchall()]
     # put all the data into one place for passing into template
@@ -43,24 +46,17 @@ def query_database(cur, time='WEEK'):  # helper function
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
-def index():
+def index(time=None):
     """ Home page view.
     """
     # create cursor into mysql database
     cur = mysql.connection.cursor(cursorclass=DictCursor)
+    
+    time = request.args.get('time')
+    if time not in ['day', 'week', 'month']:
+        time = 'week'
 
-    if request.method == 'POST':
-        time = request.form['time']  # grab user input
-        if time not in ['DAY', 'WEEK', 'YEAR']:
-            return render_template('timeline.html',
-                               title='kaceline',
-                               data=data)
-        data = query_database(cur, time)  # query db & render data
-        return render_template('timeline.html',
-                               title='kaceline',
-                               data=data)
-    # otherwise
-    data = query_database(cur)  # defaults to WEEK
+    data = query_database(cur, time)  # query db & render data
     return render_template('timeline.html',
                                title='kaceline',
                                data=data)
