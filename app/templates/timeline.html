@@ -3,22 +3,23 @@
 
 <div class="container">
 
-    <h1 class="title">kaceline</h1>
+    <img src="{{ url_for("static", filename="header.png") }}" class="header-img" />
     
+    <br />
+
     <form action="{{ url_for("index") }}" method=get class="date-range">
 	<div class="btn-group">
-    	    <input class="btn btn-default" type="submit" name="time" value="day" />
+    	    <input class="btn btn-primary" type="submit" name="time" value="day" />
     	    <input  class="btn btn-default" type="submit" name="time" value="week" />
     	    <input  class="btn btn-default" type="submit" name="time" value="month" />
 	</div>
     </form>
 
     <br />
-    <br />
-    <br />
 
     {% if data %}
         {% for date, changes in data.iteritems() %}
+        <br />
         <h2 class="date">{{ date.strftime("%A, %B %d") }}</h2>
         <br />
         <br />
@@ -26,7 +27,7 @@
         {% for change in changes %}
 	    <li class="">
 		<p>
-		    <span class="text-muted">{{ change.timestamp.strftime("%H:%M %p") }} - </span>
+		    <span class="text-muted">{{ change.timestamp.strftime("%I:%M %p") }} - </span>
 		    <span class="">{{ change.submitter_name }}</span>
 		</p>
 		<h4><a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}">{{ change.ticket_title }}</a>
