@@ -49,9 +49,7 @@ def query_database(cur, time='WEEK'):  # helper function
         if date in new_data.keys():
             new_data[date].append(change)
         else:
-            new_data[date] = [ change ]
-    
-    print(new_data)
+            new_data[date] = [change]
 
     return new_data
 
@@ -63,15 +61,15 @@ def index(time=None):
     """
     # create cursor into mysql database
     cur = mysql.connection.cursor(cursorclass=DictCursor)
-    
+
     time = request.args.get('time')
     if time not in ['day', 'week', 'month']:
         time = 'week'
 
     data = query_database(cur, time)  # query db & render data
     return render_template('timeline.html',
-                               title='kaceline',
-                               data=data)
+                           title='kaceline',
+                           data=data)
 
 
 @app.route('/changes')
