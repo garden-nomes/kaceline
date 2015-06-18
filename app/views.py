@@ -1,10 +1,11 @@
 from MySQLdb.cursors import DictCursor
 from collections import OrderedDict
+from datetime import date, timedelta, datetime
 from flask import render_template, request
 from app import app
 from app import mysql
 
-def query_database(cur, time='WEEK'):  # helper function
+def query_database(cur, start, end):  # helper function
     """ Input: cur -> MySQLdb cursor into database
                time -> a string containing one of ['DAY', 'WEEK', 'MONTH']
         Output: data -> All tickets and their associated changes from the
@@ -12,16 +13,15 @@ def query_database(cur, time='WEEK'):  # helper function
     """
     cur.execute(  # build & execute query to grab relevant tickets
         'select * from HD_TICKET'
-        ' where MODIFIED > NOW() - INTERVAL 1 %s'
-        ' and HD_QUEUE_ID = 18' % time)  # interpolate desired time frame
+        ' where HD_QUEUE_ID = 18')  # interpolate desired time frame
     tickets = [ticket for ticket in cur.fetchall()]
     tickets.sort(key=lambda t: t['MODIFIED'])
     changes = []
     for ticket in tickets:
         cur.execute(  # for each ticket, grab associated changes
             'select * from HD_TICKET_CHANGE'
-            ' where TIMESTAMP > NOW() - INTERVAL 1 %s'
-            ' and HD_TICKET_ID = %s' % (time, ticket['ID']))
+            ' where TIMESTAMP between \'%s\' and \'%s\''
+            ' and HD_TICKET_ID = %s' % (start, end + timedelta(days=1), ticket['ID']))
         changes.append([change for change in cur.fetchall()])
 
     cur.execute('select * from USER')
@@ -41,8 +41,6 @@ def query_database(cur, time='WEEK'):  # helper function
 	
     # join lists
     data = [change for sublist in data for change in sublist]
-    
-    print(data)
 	
     # group by date
     new_data = OrderedDict()
@@ -63,16 +61,22 @@ def index(time=None):
     # create cursor into mysql database
     cur = mysql.connection.cursor(cursorclass=DictCursor)
 
-    time = request.args.get('time')
-    if time not in ['day', 'week', 'month']:
-        time = 'week'
+    start = request.args.get('start')
+    end = request.args.get('end')
+    
+    if start == None or end == None:
+        end = date.today()
+        start = end - timedelta(days=7)
+    else:
+        end = datetime.strptime(end, '%m/%d/%Y')
+        start = datetime.strptime(start, '%m/%d/%Y')
 
-
-    data = query_database(cur, time)  # query db & render data
+    data = query_database(cur, start, end)  # query db & render data
     return render_template('timeline.html',
                            title='kaceline',
                            data=data,
-                           time=time)
+                           start=start,
+                           end=end)
 
 
 @app.route('/changes')

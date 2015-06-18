@@ -1,35 +1,23 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<div class="container">
-
-    <img src="{{ url_for("static", filename="header.png") }}" class="header-img" />
-    
-    <br />
-
-    <form action="{{ url_for("index") }}" method=get class="date-range">
-	<div class="btn-group">
-        {% if time == "day" %}
-			<input class="btn btn-primary" type="submit" name="time" value="day" />
-		{% else %}
-			<input class="btn btn-default" type="submit" name="time" value="day" />
-		{% endif %}
-    	
-		{% if time == "week" %}
-			<input class="btn btn-primary" type="submit" name="time" value="week" />
-		{% else %}
-			<input class="btn btn-default" type="submit" name="time" value="week" />
-		{% endif %}
-		
-		{% if time == "month" %}
-			<input class="btn btn-primary" type="submit" name="time" value="month" />
-		{% else %}
-			<input class="btn btn-default" type="submit" name="time" value="month" />
-		{% endif %}
+	<div class="row">
+		<form action="{{ url_for('index') }}" method="get" class="form-inline date-range col-md-6 col-md-offset-3">
+			<div class="form-group form-group-sm">
+				<div class="input-daterange input-group" id="datepicker">
+					<input type="text" class="form-control" name="start" value="{{ start.strftime('%m/%d/%Y') }}" />
+					<span class="input-group-addon">to</span>
+					<input type="text" class="form-control" name="end"  value="{{ end.strftime('%m/%d/%Y') }}" />
+				</div>
+			</div>
+			<input type="submit" class="btn btn-primary input-sm" value="Go!" />
+			<span class="help-block"><a href="{{ url_for('index') }}">reset</a></span>
+		</form>
 	</div>
-    </form>
 
     {% if data %}
+	<div class="row">
+	
         {% for date, changes in data.iteritems() %}
 		
         <h3 class="date">{{ date.strftime("%A, %B %d") }}</h3>
@@ -39,10 +27,10 @@
 			<tr><td>
 				<p>
 					<span class="text-muted">{{ change.timestamp.strftime("%I:%M %p") }} - </span>
-					<span class="">{{ change.submitter_name }}</span>
+					<span class="text-info">{{ change.submitter_name }}</span>
 				</p>
 				<h5>
-					<a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}">{{ change.ticket_title }}</a>
+					<a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}" target="_blank">{{ change.ticket_title }}</a>
 					{% if change.description %}<small> - {{ change.description }}</small>{% endif %}
 				</h5>
 				<p>{% for line in change.comment %}{{ line }}{% if loop.revindex0 > 0 %}<br />{% endif %}{% endfor %}
@@ -51,8 +39,8 @@
 		</table>
 		
 		{% endfor %}
+	
+	</div>
     {% endif %}
-
-</div>
 
 {% endblock %}
