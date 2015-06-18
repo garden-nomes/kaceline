@@ -29,30 +29,28 @@
 	</div>
     </form>
 
-    <br />
-
     {% if data %}
         {% for date, changes in data.iteritems() %}
-        <br />
-        <h2 class="date">{{ date.strftime("%A, %B %d") }}</h2>
-        <br />
-        <br />
-        <ul class="timeline list-unstyled">
-        {% for change in changes %}
-	    <li class="">
-		<p>
-		    <span class="text-muted">{{ change.timestamp.strftime("%I:%M %p") }} - </span>
-		    <span class="">{{ change.submitter_name }}</span>
-		</p>
-		<h4><a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}">{{ change.ticket_title }}</a>
-		    {% if change.description %}<small> - {{ change.description }}</small>{% endif %}</h4>
-
-	        <p class="comment">{{ change.comment }}</p>
-            </li>
-	    {% if loop.revindex0 > 0 %}<hr />{% endif %}
-	{% endfor %}
-	</ul>
-	{% endfor %}
+		
+        <h3 class="date">{{ date.strftime("%A, %B %d") }}</h3>
+		
+        <table class="table">
+			{% for change in changes %}
+			<tr><td>
+				<p>
+					<span class="text-muted">{{ change.timestamp.strftime("%I:%M %p") }} - </span>
+					<span class="">{{ change.submitter_name }}</span>
+				</p>
+				<h5>
+					<a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}">{{ change.ticket_title }}</a>
+					{% if change.description %}<small> - {{ change.description }}</small>{% endif %}
+				</h5>
+				<p>{% for line in change.comment %}{{ line }}{% if loop.revindex0 > 0 %}<br />{% endif %}{% endfor %}
+			</td></tr>
+			{% endfor %}
+		</table>
+		
+		{% endfor %}
     {% endif %}
 
 </div>

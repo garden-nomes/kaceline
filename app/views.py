@@ -34,14 +34,16 @@ def query_database(cur, time='WEEK'):  # helper function
                                  if u['ID'] == change['USER_ID']][0],
               'description': change['DESCRIPTION'],
               'timestamp': change['TIMESTAMP'],
-              'comment': change['COMMENT'],
+              'comment': change['COMMENT'].splitlines(),
               'ticket_title': [t['TITLE'] for t in tickets
                                if t['ID'] == change['HD_TICKET_ID']][0]}
              for change in c] for c in changes]
-
+	
     # join lists
     data = [change for sublist in data for change in sublist]
-
+    
+    print(data)
+	
     # group by date
     new_data = OrderedDict()
     for change in sorted(data, key=lambda t: t['timestamp'], reverse=True):
@@ -52,7 +54,6 @@ def query_database(cur, time='WEEK'):  # helper function
             new_data[date] = [change]
 
     return new_data
-
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
@@ -70,7 +71,8 @@ def index(time=None):
     data = query_database(cur, time)  # query db & render data
     return render_template('timeline.html',
                            title='kaceline',
-                           data=data)
+                           data=data,
+                           time=time)
 
 
 @app.route('/changes')
