@@ -11,56 +11,47 @@ def query_database(cur, start, end):  # helper function
         Output: data -> All tickets and their associated changes from the
                         last day, week, or month.
     """
-    cur.execute(  # build & execute query to grab relevant tickets
-        'select * from HD_TICKET'
-        ' where HD_QUEUE_ID = 18')  # interpolate desired time frame
-    tickets = [ticket for ticket in cur.fetchall()]
-    tickets.sort(key=lambda t: t['MODIFIED'])
-    changes = []
-    for ticket in tickets:
-        cur.execute(  # for each ticket, grab associated changes
-            'select * from HD_TICKET_CHANGE'
-            ' where TIMESTAMP between \'%s\' and \'%s\''
-            ' and HD_TICKET_ID = %s' % (start, end + timedelta(days=1), ticket['ID']))
-        changes.append([change for change in cur.fetchall()])
-
-    cur.execute('select * from USER')
-    users = [u for u in cur.fetchall()]
-    # put all the data into one place for passing into template
-    # as a list of lists of ticket change dictionaries
-    data = [[{'ticket_id': change['HD_TICKET_ID'],
-              'submitter_id':  change['USER_ID'],
-              'submitter_name': [u['USER_NAME'] for u in users
-                                 if u['ID'] == change['USER_ID']][0],
-              'description': change['DESCRIPTION'],
-              'timestamp': change['TIMESTAMP'],
-              'comment': change['COMMENT'].splitlines(),
-              'ticket_title': [t['TITLE'] for t in tickets
-                               if t['ID'] == change['HD_TICKET_ID']][0]}
-             for change in c] for c in changes]
-	
-    # join lists
-    data = [change for sublist in data for change in sublist]
-	
+    
+    cur.execute(  # grab all changes between certain time span
+        'select HD_TICKET_CHANGE.HD_TICKET_ID,'
+        ' HD_TICKET_CHANGE.USER_ID,'
+        ' HD_TICKET_CHANGE.DESCRIPTION,'
+        ' HD_TICKET_CHANGE.TIMESTAMP,'
+        ' HD_TICKET_CHANGE.COMMENT,'
+        ' HD_TICKET.TITLE,'
+        ' HD_TICKET.ID,'
+        ' USER.USER_NAME,'
+        ' USER.ID'
+        ' from HD_TICKET_CHANGE, HD_TICKET, USER'
+        ' where HD_TICKET_CHANGE.TIMESTAMP between \'%s\' and \'%s\''
+        ' and (select HD_TICKET.HD_QUEUE_ID from HD_TICKET'
+        '   where HD_TICKET.ID = HD_TICKET_CHANGE.HD_TICKET_ID) = 18'
+        ' and HD_TICKET.ID = HD_TICKET_CHANGE.HD_TICKET_ID'
+        ' and USER.ID = HD_TICKET_CHANGE.USER_ID' % (start, end + timedelta(days=1)))
+    data = cur.fetchall()
+    
+    for change in data: change['COMMENT'] = change['COMMENT'].splitlines()
+    
     # group by date
-    new_data = OrderedDict()
-    for change in sorted(data, key=lambda t: t['timestamp'], reverse=True):
-        date = change['timestamp'].date()
-        if date in new_data.keys():
-            new_data[date].append(change)
+    grouped_data = OrderedDict()
+    for change in sorted(data, key=lambda t: t['TIMESTAMP'], reverse=True):
+        date = change['TIMESTAMP'].date()
+        if date in grouped_data.keys():
+            grouped_data[date].append(change)
         else:
-            new_data[date] = [change]
+            grouped_data[date] = [change]
 
-    return new_data
+    return grouped_data
 
 @app.route('/')
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET'])
 def index(time=None):
     """ Home page view.
     """
     # create cursor into mysql database
     cur = mysql.connection.cursor(cursorclass=DictCursor)
 
+    # process arguments
     start = request.args.get('start')
     end = request.args.get('end')
     

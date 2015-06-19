@@ -26,14 +26,14 @@
 			{% for change in changes %}
 			<tr><td>
 				<p>
-					<span class="text-muted">{{ change.timestamp.strftime("%I:%M %p") }} - </span>
-					<span class="text-info">{{ change.submitter_name }}</span>
+					<span class="text-muted">{{ change.TIMESTAMP.strftime("%I:%M %p") }} - </span>
+					<span class="text-info">{{ change.USER_NAME }}</span>
 				</p>
 				<h5>
-					<a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.ticket_id }}" target="_blank">{{ change.ticket_title }}</a>
-					{% if change.description %}<small> - {{ change.description }}</small>{% endif %}
+					<a href="https://kaceapp.evergreen.edu/userui/ticket.php?ID={{ change.HD_TICKET_ID }}" target="_blank">{{ change.TITLE }}</a>
+					{% if change.DESCRIPTION %}<small> - {{ change.DESCRIPTION }}</small>{% endif %}
 				</h5>
-				<p>{% for line in change.comment %}{{ line }}{% if loop.revindex0 > 0 %}<br />{% endif %}{% endfor %}
+				<p>{% for line in change.COMMENT %}{{ line }}{% if loop.revindex0 > 0 %}<br />{% endif %}{% endfor %}
 			</td></tr>
 			{% endfor %}
 		</table>
