@@ -2,7 +2,7 @@
 {% block body %}
 
 	<div class="row">
-		<form action="{{ url_for('index') }}" method="get" class="form-inline date-range col-md-6 col-md-offset-3">
+		<form action="{{ url_for('index') }}" method="get" class="form-inline date-range">
 			<div class="form-group form-group-sm">
 				<div class="input-daterange input-group" id="datepicker">
 					<input type="text" class="form-control" name="start" value="{{ start.strftime('%m/%d/%Y') }}" />
