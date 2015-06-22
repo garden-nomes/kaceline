@@ -9,6 +9,12 @@
 					<span class="input-group-addon">to</span>
 					<input type="text" class="form-control" name="end"  value="{{ end.strftime('%m/%d/%Y') }}" />
 				</div>
+                <div class="input-queue-id input-group" id="queuepicker">
+                    <select name='queue'>
+                        <option value='1'>Help Desk</option>
+                        <option value='18'>Client Management</option>
+                    </select>
+                </div>
 			</div>
 			<input type="submit" class="btn btn-primary input-sm" value="Go!" />
 			<span class="help-block"><a href="{{ url_for('index') }}">reset</a></span>

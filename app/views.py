@@ -5,14 +5,17 @@ from flask import render_template, request
 from app import app
 from app import mysql
 
-def query_database(cur, start, end):  # helper function
+
+def query_database(cur, start, end, queue=18):  # helper function
     """ Input: cur -> MySQLdb cursor into database
-               time -> a string containing one of ['DAY', 'WEEK', 'MONTH']
+               start, end -> datetime objects specifying an interval
+                             (start <= end)
+               queue -> an integer specifying the queue ID
         Output: data -> All tickets and their associated changes from the
                         last day, week, or month.
     """
-    
-    cur.execute(  # grab all changes between certain time span
+
+    cur.execute(  # grab all ticket changes between certain time span
         'select HD_TICKET_CHANGE.HD_TICKET_ID,'
         ' HD_TICKET_CHANGE.USER_ID,'
         ' HD_TICKET_CHANGE.DESCRIPTION,'
@@ -25,13 +28,15 @@ def query_database(cur, start, end):  # helper function
         ' from HD_TICKET_CHANGE, HD_TICKET, USER'
         ' where HD_TICKET_CHANGE.TIMESTAMP between \'%s\' and \'%s\''
         ' and (select HD_TICKET.HD_QUEUE_ID from HD_TICKET'
-        '   where HD_TICKET.ID = HD_TICKET_CHANGE.HD_TICKET_ID) = 18'
+        '   where HD_TICKET.ID = HD_TICKET_CHANGE.HD_TICKET_ID) = %s'
         ' and HD_TICKET.ID = HD_TICKET_CHANGE.HD_TICKET_ID'
-        ' and USER.ID = HD_TICKET_CHANGE.USER_ID' % (start, end + timedelta(days=1)))
+        ' and USER.ID = HD_TICKET_CHANGE.USER_ID'
+        % (start, end + timedelta(days=1), queue))
     data = cur.fetchall()
-    
-    for change in data: change['COMMENT'] = change['COMMENT'].splitlines()
-    
+
+    for change in data:
+        change['COMMENT'] = change['COMMENT'].splitlines()
+
     # group by date
     grouped_data = OrderedDict()
     for change in sorted(data, key=lambda t: t['TIMESTAMP'], reverse=True):
@@ -42,6 +47,7 @@ def query_database(cur, start, end):  # helper function
             grouped_data[date] = [change]
 
     return grouped_data
+
 
 @app.route('/')
 @app.route('/index', methods=['GET'])
@@ -54,22 +60,22 @@ def index(time=None):
     # process arguments
     start = request.args.get('start')
     end = request.args.get('end')
-    
-    if start == None or end == None:
+    queue = request.args.get('queue')
+    print queue
+
+    if queue is None:
+        queue = 18
+    if start is None or end is None:
         end = date.today()
         start = end - timedelta(days=7)
     else:
         end = datetime.strptime(end, '%m/%d/%Y')
         start = datetime.strptime(start, '%m/%d/%Y')
 
-    data = query_database(cur, start, end)  # query db & render data
+    data = query_database(cur, start, end, queue)  # query db & render data
     return render_template('timeline.html',
                            title='kaceline',
                            data=data,
                            start=start,
-                           end=end)
-
-
-@app.route('/changes')
-def changes():
-    return NotImplementedError
+                           end=end,
+                           queue=queue)
