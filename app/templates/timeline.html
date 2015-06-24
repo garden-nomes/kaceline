@@ -6,8 +6,8 @@
 			<div class='col-md-8 col-md-offset-2'>
 				<div class='form-group form-group-sm' id='queuepicker'>
 					<select name='queue' class='form-control'>
-						<option value='1'>Help Desk</option>
-						<option value='18'>Client Management</option>
+						<option value='1'{{ ' selected' if queue == '1' }}>Help Desk</option>
+						<option value='18'{{ ' selected' if queue == '18' }}>Client Management</option>
 					</select>
 				</div>
 			</div>
