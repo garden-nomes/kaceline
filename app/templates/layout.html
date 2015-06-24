@@ -18,8 +18,8 @@
 <body>
 
 	<div class="container">
-
-		<img src="{{ url_for("static", filename="header.jpg") }}" class="header-img" />
+		
+		<img src='{{ url_for("static", filename="header.jpg") }}' class="header-img" />
 		<br />
 
 		{% with messages = get_flashed_messages() %}
@@ -31,8 +31,12 @@
 				</ul>
 			{% endif %}
 		{% endwith %}
-
-		{% block body %}{% endblock %}
-
+		
+		{% block timeline %}{% endblock %}
+		
+		<p class="text-muted text-center small">
+			Developed by tc_isaak and tc_noah using <a href="http://flask.pocoo.org/">Flask</a>, check out the code at
+			<a href="https://gitlab-server.evergreen.edu/sysops/operation-kaceline">https://gitlab-server.evergreen.edu/sysops/operation-kaceline</a>.
+		</p>
 	</div>
 </body>
