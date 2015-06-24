@@ -23,6 +23,7 @@ def query_database(cur, start, end, queue=18):  # helper function
         ' HD_TICKET_CHANGE.COMMENT,'
         ' HD_TICKET.TITLE,'
         ' HD_TICKET.ID,'
+        ' HD_TICKET.HD_STATUS_ID, '
         ' USER.USER_NAME,'
         ' USER.ID'
         ' from HD_TICKET_CHANGE, HD_TICKET, USER'
