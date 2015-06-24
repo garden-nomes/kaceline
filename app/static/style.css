@@ -1,15 +1,3 @@
-/* Align */
-.content {
-	margin-left: auto;
-	margin-right: auto;
-	width: 700px;
-}
-
-.date-range {
-	display: block;
-	text-align: center;
-}
-
 h1	{ text-align: center; }
 .date { text-align: center; }
 .header-img {
