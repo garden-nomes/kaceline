@@ -52,7 +52,7 @@ def query_database(cur, start, end, queue=18):  # helper function
 
 @app.route('/')
 @app.route('/index', methods=['GET'])
-def index(time=None):
+def index():
     """ Home page view.
     """
     # create cursor into mysql database
@@ -62,10 +62,10 @@ def index(time=None):
     start = request.args.get('start')
     end = request.args.get('end')
     queue = request.args.get('queue')
-    print queue
 
     if queue is None:
-        queue = 18
+        queue = 18	# client management
+    
     if start is None or end is None:
         end = date.today()
         start = end - timedelta(days=7)
