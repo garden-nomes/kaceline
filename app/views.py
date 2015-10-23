@@ -5,6 +5,11 @@ from flask import render_template, request
 from app import app
 from app import mysql
 
+queues = { 'clientmanagement': 18,
+           'sysops': 18,
+           'acadtech': 29,
+			  'frontdesk': 29,
+           'academictechnology': 29 }
 
 def query_database(cur, start, end, queue=18):  # helper function
     """ Input: cur -> MySQLdb cursor into database
@@ -52,7 +57,8 @@ def query_database(cur, start, end, queue=18):  # helper function
 
 @app.route('/')
 @app.route('/index', methods=['GET'])
-def index():
+@app.route('/<queue>', methods=['GET'])
+def index(queue=None):
     """ Home page view.
     """
     # create cursor into mysql database
@@ -61,10 +67,9 @@ def index():
     # process arguments
     start = request.args.get('start')
     end = request.args.get('end')
-    queue = request.args.get('queue')
 
-    if queue is None:
-        queue = 18	# client management
+    queue_number = queues.get(queue, 18) # sets 18 as default value
+	     
     
     if start is None or end is None:
         end = date.today()
@@ -73,10 +78,10 @@ def index():
         end = datetime.strptime(end, '%m/%d/%Y')
         start = datetime.strptime(start, '%m/%d/%Y')
 
-    data = query_database(cur, start, end, queue)  # query db & render data
+    data = query_database(cur, start, end, queue_number)  # query db & render data
     return render_template('timeline.html',
                            title='kaceline',
                            data=data,
                            start=start,
                            end=end,
-                           queue=queue)
+                           queue=queue_number)
