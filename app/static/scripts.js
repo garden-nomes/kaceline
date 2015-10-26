@@ -16,6 +16,14 @@ function timeSpan(span) {
 	 $('#end').val((end.getMonth() + 1) + '/' + end.getDate() + '/' + end.getFullYear());
 }
 
+function toggleShowClosed() {
+ if ($(".closed").css("display") == "none") {
+	 $(".closed").css("display", "inline");
+ } else {
+	 $(".closed").css("display", "none");
+ }
+}
+
 $(document).ready(function() {
     $('#day').click(function() {
 	     timeSpan('day');
@@ -25,5 +33,9 @@ $(document).ready(function() {
     });
     $('#month').click(function() {
 	     timeSpan('month');
+    });
+
+	 $("#toggleShowClosedButton").click(function() {
+	     toggleShowClosed();
     });
 });
